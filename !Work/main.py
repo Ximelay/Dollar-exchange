@@ -41,7 +41,7 @@ class Currency:
       print("Курс сильно упал, может пора что-то делать?")
       self.send_mail()
     
-    print("Сейчас курс: 1 доллар = " + str(currency))
+    print("Сейчас курс: 1 доллар = " + str(currency) + " RUB")
     time.sleep(3) # Засыпание программы на 3 секунды
     self.check_currency()
     
