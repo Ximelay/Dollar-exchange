@@ -2,6 +2,10 @@ import requests # Модуль для обработки URL
 from bs4 import BeautifulSoup # Модуль для работы с HTML
 import time
 import smtplib # Модуль для работы с почтой
+import matplotlib.pyplot as plt
+from datetime import datetime
+import signal
+import sys
 
 # Основной класс:
 
@@ -14,6 +18,7 @@ class Currency:
   
   current_converted_price = 0
   defference = 1 # Разница после которой будет отправлено сообщение на почту
+  currency_history = []
   
   def __init__(self):
     # Установка курса валюты
@@ -34,6 +39,8 @@ class Currency:
   # Проверка изменения валюты
   def check_currency(self):
     currency = float(self.get_currency_prise().replace(",", "."))
+    self.currency_history.append((datetime.now(), currency))
+    self.plot_currency_history()
     if currency >= self.current_converted_price + self.defference:
       print("Курс сильно вырос, может пора что-то делать?")
       self.send_mail()
@@ -64,6 +71,24 @@ class Currency:
       message
     )
     server.quit()
+  
+  def plot_currency_history(self):
+    times = [entry[0] for entry in self.currency_history]
+    prices = [entry[1] for entry in self.currency_history]
+    plt.plot(times, prices)
+    plt.xlabel('Время')
+    plt.ylabel('USD to RUB')
+    plt.title('История обменного курса валюты')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('currency_history_plot.png')
+    plt.close()
+    
+def signal_handler(sig, frame):
+  print('Вы нажали Ctrl+C. Программа завершает работу.')
+  sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # Создание объекта и вызов метода
 currency = Currency()
